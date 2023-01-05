@@ -9,7 +9,7 @@ TARGET = main
 OBJ_FILES = $(TARGET).o glad.o
 INC_FILES = $(TARGET).h glad.c
 
-LIBRARIES = -ldl -lglfw
+LIBRARIES = -lglfw3 -lGL -lX11 -lpthread -lXrandr -lXi -ldl
 
 all: $(TARGET)
 
