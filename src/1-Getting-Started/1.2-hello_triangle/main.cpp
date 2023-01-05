@@ -95,29 +95,59 @@ int main()
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
-    // Define the vertices for a rectangle
+    // // Define the vertices for a rectangle
+    // constexpr float vertices[] = {
+    //     0.5f,
+    //     0.5f,
+    //     0.0f,
+    //     0.5f,
+    //     -0.5f,
+    //     0.0f,
+    //     -0.5f,
+    //     -0.5f,
+    //     0.0f,
+    //     -0.5f,
+    //     0.5f,
+    //     0.0f
+
+    // constexpr unsigned int indices[] = {
+    //     0,
+    //     1,
+    //     3,
+    //     1,
+    //     2,
+    //     3
+    // };
+
+    // Define the vertices for two triangles
     constexpr float vertices[] = {
-        0.5f,
-        0.5f,
+        -1.0f,
         0.0f,
-        0.5f,
-        -0.5f,
         0.0f,
-        -0.5f,
-        -0.5f,
+        -0.2f,
         0.0f,
-        -0.5f,
-        0.5f,
-        0.0f
+        0.0f,
+        -0.6f,
+        0.6f,
+        0.0f,
+        1.0f,
+        0.0f,
+        0.0f,
+        0.2f,
+        0.0f,
+        0.0f,
+        0.6f,
+        0.6f,
+        0.0f,
     };
 
     constexpr unsigned int indices[] = {
         0,
         1,
-        3,
-        1,
         2,
-        3
+        3,
+        4,
+        5
     };
 
     // Define the vertex buffer and array objects.
