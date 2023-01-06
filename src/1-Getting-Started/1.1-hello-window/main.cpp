@@ -18,6 +18,9 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#if __APPLE__
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
 
     /**
      * Next, we need to create the window object to hold the windowing information.
@@ -65,7 +68,7 @@ int main()
 
         // Rendering commands here
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f); // Set the color of the clear function
-        glClear(GL_COLOR_BUFFER_BIT);         // Clear the screen from the previous buffer
+        glClear(GL_COLOR_BUFFER_BIT); // Clear the screen from the previous buffer
 
         // Check and call events and swap the buffers
         glfwSwapBuffers(window);

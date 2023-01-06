@@ -7,9 +7,17 @@ ARGS =
 
 TARGET = main
 OBJ_FILES = $(TARGET).o glad.o
-INC_FILES = $(TARGET).h glad.c
+INC_FILES = $(TARGET).h glad.h
 
-LIBRARIES = -lglfw3 -lGL -lX11 -lpthread -lXrandr -lXi -ldl
+UNAME := $(shell uname)
+
+LIBRARIES = 
+ifeq ($(UNAME), Linux)
+	LIBRARIES += -lglfw3 -lGL -lX11 -lpthread -lXrandr -lXi -ldl
+endif
+ifeq ($(UNAME), Darwin)
+	LIBRARIES += -lglfw -framework CoreVideo -framework OpenGL -framework IOKit -framework Cocoa -framework Carbon
+endif
 
 all: $(TARGET)
 
