@@ -15,12 +15,19 @@ const char* vertexShaderSource = "#version 330 core\n"
                                  "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
                                  "}\0";
 
-const char* fragmentShaderSource = "#version 330 core\n"
-                                   "out vec4 FragColor;\n"
-                                   "void main()\n"
-                                   "{\n"
-                                   "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-                                   "}\n\0";
+const char* orange_FragmentShaderSource = "#version 330 core\n"
+                                          "out vec4 FragColor;\n"
+                                          "void main()\n"
+                                          "{\n"
+                                          "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+                                          "}\n\0";
+
+const char* yellow_FragmentShaderSource = "#version 330 core\n"
+                                          "out vec4 FragColor;\n"
+                                          "void main()\n"
+                                          "{\n"
+                                          "   FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
+                                          "}\n\0";
 
 int main()
 {
@@ -68,7 +75,7 @@ int main()
 
     // Create a fragment object as well
     unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    glShaderSource(fragmentShader, 1, &orange_FragmentShaderSource, NULL);
     glCompileShader(fragmentShader);
 
     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
@@ -80,95 +87,71 @@ int main()
 
     // A shader program is the final linked version of multiple shaders combined
     // Whenever we want to render objects, we need to call this program
-    unsigned int shaderProgram = glCreateProgram();
+    unsigned int orangeShaderProgram = glCreateProgram();
+    glAttachShader(orangeShaderProgram, vertexShader);
+    glAttachShader(orangeShaderProgram, fragmentShader);
+    glLinkProgram(orangeShaderProgram);
 
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    glGetProgramiv(orangeShaderProgram, GL_LINK_STATUS, &success);
     if (!success) {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        glGetProgramInfoLog(orangeShaderProgram, 512, NULL, infoLog);
         std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n"
                   << infoLog << std::endl;
     }
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
-    // // Define the vertices for a rectangle
-    // constexpr float vertices[] = {
-    //     0.5f,
-    //     0.5f,
-    //     0.0f,
-    //     0.5f,
-    //     -0.5f,
-    //     0.0f,
-    //     -0.5f,
-    //     -0.5f,
-    //     0.0f,
-    //     -0.5f,
-    //     0.5f,
-    //     0.0f
+    glShaderSource(fragmentShader, 1, &yellow_FragmentShaderSource, NULL);
+    glCompileShader(fragmentShader);
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n"
+                  << infoLog << std::endl;
+    }
+    // A shader program is the final linked version of multiple shaders combined
+    // Whenever we want to render objects, we need to call this program
+    unsigned int yellowShaderProgram = glCreateProgram();
 
-    // constexpr unsigned int indices[] = {
-    //     0,
-    //     1,
-    //     3,
-    //     1,
-    //     2,
-    //     3
-    // };
+    glAttachShader(yellowShaderProgram, vertexShader);
+    glAttachShader(yellowShaderProgram, fragmentShader);
+    glLinkProgram(yellowShaderProgram);
 
-    // Define the vertices for two triangles
-    constexpr float vertices[] = {
-        -1.0f,
-        0.0f,
-        0.0f,
-        -0.2f,
-        0.0f,
-        0.0f,
-        -0.6f,
-        0.6f,
-        0.0f,
-        1.0f,
-        0.0f,
-        0.0f,
-        0.2f,
-        0.0f,
-        0.0f,
-        0.6f,
-        0.6f,
-        0.0f,
-    };
+    glGetProgramiv(yellowShaderProgram, GL_LINK_STATUS, &success);
+    if (!success) {
+        glGetProgramInfoLog(yellowShaderProgram, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n"
+                  << infoLog << std::endl;
+    }
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
 
-    constexpr unsigned int indices[] = {
-        0,
-        1,
-        2,
-        3,
-        4,
-        5
+    constexpr unsigned int NUMBER_OF_TRIANGLES = 2;
+
+    constexpr float triangles[NUMBER_OF_TRIANGLES][3 * 3] = {
+        { -1.0f, 0.0f, 0.0f,
+            -0.2f, 0.0f, 0.0f,
+            -0.6f, 0.6f, 0.0f },
+        { 1.0f, 0.0f, 0.0f,
+            0.2f, 0.0f, 0.0f,
+            0.6f, 0.6f, 0.0f }
     };
 
     // Define the vertex buffer and array objects.
     // The vertex buffer object store and send data to the GPU.
     // The vertex array object reflect the data stored in one or more vertex buffer objects
-    unsigned int VBO, VAO, EBO;
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-    glGenVertexArrays(1, &VAO);
+    unsigned int VAOs[NUMBER_OF_TRIANGLES], VBOs[NUMBER_OF_TRIANGLES];
+    glGenVertexArrays(NUMBER_OF_TRIANGLES, VAOs);
+    glGenBuffers(NUMBER_OF_TRIANGLES, VBOs);
 
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);         // Binds the VBO to the array buffer
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO); // Binds the VBO to the array buffer
-
-    // Copy the data from our array of vertices into the vertex buffer
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    // Now we need to specify how OpenGL should interpret the vertex data
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
+    for (int i = 0; i < NUMBER_OF_TRIANGLES; i++) {
+        glBindVertexArray(VAOs[i]);
+        glBindBuffer(GL_ARRAY_BUFFER, VBOs[i]); // Binds the VBO to the array buffer
+        glBufferData(GL_ARRAY_BUFFER, sizeof(triangles[i]), triangles[i], GL_STATIC_DRAW);
+        // Now we need to specify how OpenGL should interpret the vertex data
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+    }
 
     // Wireframe mode
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -186,10 +169,13 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shaderProgram);
-        glBindVertexArray(VAO);
-        // glDrawArrays(GL_TRIANGLES, 0, 3);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glUseProgram(orangeShaderProgram);
+        glBindVertexArray(VAOs[0]);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        glUseProgram(yellowShaderProgram);
+        glBindVertexArray(VAOs[1]);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         // GLFW: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -199,9 +185,10 @@ int main()
 
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-    glDeleteProgram(shaderProgram);
+    glDeleteVertexArrays(2, VAOs);
+    glDeleteBuffers(2, VBOs);
+    glDeleteProgram(orangeShaderProgram);
+    glDeleteProgram(yellowShaderProgram);
 
     // GLFW: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
