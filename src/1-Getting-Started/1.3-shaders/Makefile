@@ -1,0 +1,32 @@
+.PHONY: all run execute clean clearscr
+CXX = g++
+LD = g++
+CXXFLAGS = 
+LDFLAGS = 
+ARGS = 
+
+TARGET = main
+OBJ_FILES = $(TARGET).o glad.o
+INC_FILES = $(TARGET).h glad.h
+
+LIBRARIES = -lglfw3 -lGL -lX11 -lpthread -lXrandr -lXi -ldl
+
+all: $(TARGET)
+
+$(TARGET): $(OBJ_FILES)
+	$(LD) $(LDFLAGS) $(OBJ_FILES) -o $@ $(LIBRARIES)
+
+%.o : %.c $(INC_FILES)
+	$(CXX) $(CXXFLAGS) -o $@ $<
+
+run: | clearscr all execute clean
+
+execute: $(TARGET)
+	@echo "Running $(TARGET)\n"
+
+	@./$(TARGET) $(ARGS)
+clean:
+	@rm -rf core $(TARGET) $(OBJ_FILES)
+
+clearscr:
+	@clear
