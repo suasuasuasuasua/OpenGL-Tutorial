@@ -26,7 +26,7 @@ int main()
      * Next, we need to create the window object to hold the windowing information.
      * This object is required by most of the other GLFW functions
      */
-    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "LearnOpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Chapter 4: Hello Window", NULL, NULL);
     if (window == NULL) {
         std::cout << "Failed to create a GLFW window" << std::endl;
         glfwTerminate();
