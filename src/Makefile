@@ -13,7 +13,7 @@ UNAME := $(shell uname)
 
 LIBRARIES = 
 ifeq ($(UNAME), Linux)
-	LIBRARIES += -lglfw3 -lGL -lX11 -lpthread -lXrandr -lXi -ldl
+	LIBRARIES += -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl
 endif
 ifeq ($(UNAME), Darwin)
 	LIBRARIES += -lglfw -framework CoreVideo -framework OpenGL -framework IOKit -framework Cocoa -framework Carbon
