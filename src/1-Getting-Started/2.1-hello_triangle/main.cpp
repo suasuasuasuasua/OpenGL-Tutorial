@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <vector>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
@@ -8,6 +9,7 @@ void processInput(GLFWwindow* window);
 constexpr unsigned int SCR_WIDTH = 800;
 constexpr unsigned int SCR_HEIGHT = 600;
 
+// Define a basic vertex shader in GLSL
 const char* vertexShaderSource = "#version 330 core\n"
                                  "layout (location = 0) in vec3 aPos;\n"
                                  "void main()\n"
@@ -15,18 +17,12 @@ const char* vertexShaderSource = "#version 330 core\n"
                                  "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
                                  "}\0";
 
+// Define a fragment shader source that colors in orange
 const char* orange_FragmentShaderSource = "#version 330 core\n"
                                           "out vec4 FragColor;\n"
                                           "void main()\n"
                                           "{\n"
                                           "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-                                          "}\n\0";
-
-const char* yellow_FragmentShaderSource = "#version 330 core\n"
-                                          "out vec4 FragColor;\n"
-                                          "void main()\n"
-                                          "{\n"
-                                          "   FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
                                           "}\n\0";
 
 int main()
@@ -65,11 +61,10 @@ int main()
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
     glCompileShader(vertexShader);
 
-    // Check if GLFW was able to compile the vertex shader code
+    // Check if the vertex shaders were linked and compiled successfully
     int success;
     char infoLog[512];
     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-
     if (!success) {
         glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
         std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
@@ -95,6 +90,7 @@ int main()
     glAttachShader(orangeShaderProgram, fragmentShader);
     glLinkProgram(orangeShaderProgram);
 
+    // Check if the fragment shaders were linked and compiled successfully
     glGetProgramiv(orangeShaderProgram, GL_LINK_STATUS, &success);
     if (!success) {
         glGetProgramInfoLog(orangeShaderProgram, 512, NULL, infoLog);
@@ -104,60 +100,47 @@ int main()
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
-    glShaderSource(fragmentShader, 1, &yellow_FragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n"
-                  << infoLog << std::endl;
-    }
-    // A shader program is the final linked version of multiple shaders combined
-    // Whenever we want to render objects, we need to call this program
-    unsigned int yellowShaderProgram = glCreateProgram();
-
-    glAttachShader(yellowShaderProgram, vertexShader);
-    glAttachShader(yellowShaderProgram, fragmentShader);
-    glLinkProgram(yellowShaderProgram);
-
-    glGetProgramiv(yellowShaderProgram, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(yellowShaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n"
-                  << infoLog << std::endl;
-    }
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
-    constexpr unsigned int NUMBER_OF_TRIANGLES = 2;
-
-    constexpr float triangles[NUMBER_OF_TRIANGLES][3 * 3] = {
-        { -1.0f, 0.0f, 0.0f,
-            -0.2f, 0.0f, 0.0f,
-            -0.6f, 0.6f, 0.0f },
-        { 1.0f, 0.0f, 0.0f,
-            0.2f, 0.0f, 0.0f,
-            0.6f, 0.6f, 0.0f }
+    // Define the vertices for the triangle
+    constexpr float vertices[] = {
+        -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+        0.0f, 0.5f, 0.0f
     };
 
-    // Define the vertex buffer and array objects.
-    // The vertex buffer object store and send data to the GPU.
-    // The vertex array object reflect the data stored in one or more vertex buffer objects
-    unsigned int VAOs[NUMBER_OF_TRIANGLES], VBOs[NUMBER_OF_TRIANGLES];
-    glGenVertexArrays(NUMBER_OF_TRIANGLES, VAOs);
-    glGenBuffers(NUMBER_OF_TRIANGLES, VBOs);
+    // Define the vertex buffer object and vertex array object
+    // The vertex buffer object stores the vertices in a memory buffer on the GPU
+    // The vertex array object stores the vertex attribute configuration
+    unsigned int VBO, VAO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
 
-    for (int i = 0; i < NUMBER_OF_TRIANGLES; i++) {
-        glBindVertexArray(VAOs[i]);
-        glBindBuffer(GL_ARRAY_BUFFER, VBOs[i]); // Binds the VBO to the array buffer
-        glBufferData(GL_ARRAY_BUFFER, sizeof(triangles[i]), triangles[i], GL_STATIC_DRAW);
-        // Now we need to specify how OpenGL should interpret the vertex data
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
-    }
+    // Create a Vertex Array Object and bind it
+    glBindVertexArray(VAO);
 
-    // Wireframe mode
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // Create a Vertex Buffer Object and copy the vertex data to it
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // Define how OpenGL should interpret the vertex data (per vertex attribute)
+    // Here, the first parameter is which vertex attribute to configure.
+    //  in this case, we defined layout=0 in the shader source, which means we
+    //  are passing data to this attribute
+    // The second parameter is the size of the vertex attribute. Since the vertex
+    //  attribute is a vec3, it is composed of 3 values.
+    // The third parameter is the type of the data, which is GL_FLOAT
+    // The fourth parameter specifies if we want the data to be normalized. If we
+    //  set this to GL_TRUE, all values that are not 0 or 1 will be mapped to -1 and 1
+    // The fifth parameter is known as the stride and tells us the space between
+    //  consecutive vertex attributes. Since the next set of position data is located
+    //  exactly 3 times the size of a float away we specify that value as the stride.
+    // The last parameter is of type void* and thus requires that weird cast.
+    //  This value tells us the offset of where the position data begins in the buffer.
+    //  Since the position data is at the start of the data array this value is just 0.
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     ////////////////////////////////////////
     // Render loop
@@ -167,34 +150,21 @@ int main()
         // -----
         processInput(window);
 
-        // Render
-        // ------
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        glUseProgram(orangeShaderProgram);
-        glBindVertexArray(VAOs[0]);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
-        glUseProgram(yellowShaderProgram);
-        glBindVertexArray(VAOs[1]);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
         // GLFW: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
+        // -------------------------------------------------------------------------------
+        glUseProgram(orangeShaderProgram);
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-    // optional: de-allocate all resources once they've outlived their purpose:
-    // ------------------------------------------------------------------------
-    glDeleteVertexArrays(2, VAOs);
-    glDeleteBuffers(2, VBOs);
-    glDeleteProgram(orangeShaderProgram);
-    glDeleteProgram(yellowShaderProgram);
-
     // GLFW: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteProgram(orangeShaderProgram);
     glfwTerminate();
     ////////////////////////////////////////
 
