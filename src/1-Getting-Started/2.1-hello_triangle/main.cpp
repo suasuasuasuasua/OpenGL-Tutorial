@@ -101,41 +101,37 @@ int main()
     glDeleteShader(fragmentShader);
 
     // Define the vertices for the triangle
-    constexpr float vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f, 0.5f, 0.0f
+    constexpr float first[] = {
+        -0.9f, -0.5f, 0.0f,
+        -0.0f, -0.5f, 0.0f,
+        -0.45f, 0.5f, 0.0f
+    };
+    constexpr float second[] = {
+        0.0f, -0.5f, 0.0f,
+        0.9f, -0.5f, 0.0f,
+        0.45f, 0.5f, 0.0f
     };
 
     // Define the vertex buffer object and vertex array object
     // The vertex buffer object stores the vertices in a memory buffer on the GPU
     // The vertex array object stores the vertex attribute configuration
-    unsigned int VBO, VAO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
+    unsigned int VBOs[2], VAOs[2];
+    glGenVertexArrays(2, VAOs);
+    glGenBuffers(2, VBOs);
 
-    // Create a Vertex Array Object and bind it
-    glBindVertexArray(VAO);
+    // Bind and set the first triangle
+    glBindVertexArray(VAOs[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
 
-    // Create a Vertex Buffer Object and copy the vertex data to it
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(first), first, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
 
-    // Define how OpenGL should interpret the vertex data (per vertex attribute)
-    // Here, the first parameter is which vertex attribute to configure.
-    //  in this case, we defined layout=0 in the shader source, which means we
-    //  are passing data to this attribute
-    // The second parameter is the size of the vertex attribute. Since the vertex
-    //  attribute is a vec3, it is composed of 3 values.
-    // The third parameter is the type of the data, which is GL_FLOAT
-    // The fourth parameter specifies if we want the data to be normalized. If we
-    //  set this to GL_TRUE, all values that are not 0 or 1 will be mapped to -1 and 1
-    // The fifth parameter is known as the stride and tells us the space between
-    //  consecutive vertex attributes. Since the next set of position data is located
-    //  exactly 3 times the size of a float away we specify that value as the stride.
-    // The last parameter is of type void* and thus requires that weird cast.
-    //  This value tells us the offset of where the position data begins in the buffer.
-    //  Since the position data is at the start of the data array this value is just 0.
+    // Bind and set the second triangle
+    glBindVertexArray(VAOs[1]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);
+
+    glBufferData(GL_ARRAY_BUFFER, sizeof(second), second, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
@@ -153,7 +149,9 @@ int main()
         // GLFW: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glUseProgram(orangeShaderProgram);
-        glBindVertexArray(VAO);
+        glBindVertexArray(VAOs[0]);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glBindVertexArray(VAOs[1]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
@@ -162,8 +160,8 @@ int main()
 
     // GLFW: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
+    glDeleteVertexArrays(2, VAOs);
+    glDeleteBuffers(2, VBOs);
     glDeleteProgram(orangeShaderProgram);
     glfwTerminate();
     ////////////////////////////////////////

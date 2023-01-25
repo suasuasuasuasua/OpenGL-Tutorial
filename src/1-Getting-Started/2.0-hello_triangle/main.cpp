@@ -137,6 +137,8 @@ int main()
     //  This value tells us the offset of where the position data begins in the buffer.
     //  Since the position data is at the start of the data array this value is just 0.
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    // Next enable the vertex attribute because it is currently disabled by default
+    // This is the vertex attribute location
     glEnableVertexAttribArray(0);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
