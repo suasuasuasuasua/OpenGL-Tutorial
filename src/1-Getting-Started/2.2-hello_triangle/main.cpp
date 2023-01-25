@@ -23,13 +23,6 @@ const char* orange_FragmentShaderSource = "#version 330 core\n"
                                           "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
                                           "}\n\0";
 
-const char* yellow_FragmentShaderSource = "#version 330 core\n"
-                                          "out vec4 FragColor;\n"
-                                          "void main()\n"
-                                          "{\n"
-                                          "   FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
-                                          "}\n\0";
-
 int main()
 {
     ////////////////////////////////////////
@@ -105,33 +98,7 @@ int main()
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
-    glShaderSource(fragmentShader, 1, &yellow_FragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n"
-                  << infoLog << std::endl;
-    }
-    // A shader program is the final linked version of multiple shaders combined
-    // Whenever we want to render objects, we need to call this program
-    unsigned int yellowShaderProgram = glCreateProgram();
-
-    glAttachShader(yellowShaderProgram, vertexShader);
-    glAttachShader(yellowShaderProgram, fragmentShader);
-    glLinkProgram(yellowShaderProgram);
-
-    glGetProgramiv(yellowShaderProgram, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(yellowShaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n"
-                  << infoLog << std::endl;
-    }
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
     constexpr unsigned int NUMBER_OF_TRIANGLES = 2;
-
     constexpr float triangles[NUMBER_OF_TRIANGLES][3 * 3] = {
         { -1.0f, 0.0f, 0.0f,
             -0.2f, 0.0f, 0.0f,
@@ -173,13 +140,11 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(orangeShaderProgram);
-        glBindVertexArray(VAOs[0]);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
-        glUseProgram(yellowShaderProgram);
-        glBindVertexArray(VAOs[1]);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        for (int i = 0; i < NUMBER_OF_TRIANGLES; i++) {
+            glUseProgram(orangeShaderProgram);
+            glBindVertexArray(VAOs[i]);
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+        }
 
         // GLFW: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -192,7 +157,6 @@ int main()
     glDeleteVertexArrays(2, VAOs);
     glDeleteBuffers(2, VBOs);
     glDeleteProgram(orangeShaderProgram);
-    glDeleteProgram(yellowShaderProgram);
 
     // GLFW: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------

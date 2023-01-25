@@ -173,13 +173,14 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(orangeShaderProgram);
-        glBindVertexArray(VAOs[0]);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
-        glUseProgram(yellowShaderProgram);
-        glBindVertexArray(VAOs[1]);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        for (int i = 0; i < NUMBER_OF_TRIANGLES; i++) {
+            if (i % 2 == 0)
+                glUseProgram(orangeShaderProgram);
+            else
+                glUseProgram(yellowShaderProgram);
+            glBindVertexArray(VAOs[i]);
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+        }
 
         // GLFW: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
