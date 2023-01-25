@@ -1,0 +1,35 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-std=c++17",
+      "-c",
+      "-I",
+      "/opt/homebrew/include",
+      "-I",
+      "/usr/local/include",
+      "-o",
+      "main.o",
+      "main.cpp"
+    ],
+    "directory": "/Users/justinhoang/Code/OpenGL-Tutorial/src/1-Getting-Started/1.1-hello-window",
+    "file": "/Users/justinhoang/Code/OpenGL-Tutorial/src/1-Getting-Started/1.1-hello-window/main.cpp",
+    "output": "/Users/justinhoang/Code/OpenGL-Tutorial/src/1-Getting-Started/1.1-hello-window/main.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-c",
+      "-I",
+      "/opt/homebrew/include",
+      "-I",
+      "/usr/local/include",
+      "-o",
+      "glad.o",
+      "glad.c"
+    ],
+    "directory": "/Users/justinhoang/Code/OpenGL-Tutorial/src/1-Getting-Started/1.1-hello-window",
+    "file": "/Users/justinhoang/Code/OpenGL-Tutorial/src/1-Getting-Started/1.1-hello-window/glad.c",
+    "output": "/Users/justinhoang/Code/OpenGL-Tutorial/src/1-Getting-Started/1.1-hello-window/glad.o"
+  }
+]
